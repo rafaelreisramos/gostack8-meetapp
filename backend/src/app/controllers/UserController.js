@@ -54,8 +54,7 @@ class UserController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { oldPassword } = req.body;
-    let { email } = req.body;
+    const { oldPassword, email } = req.body;
 
     /**
      * User can update his own email so we check by id.
@@ -64,22 +63,22 @@ class UserController {
     const user = await User.findByPk(req.userId);
 
     /**
-     * Since email is not requires we have to check if it really exists
+     * Since email is not required we need to check if it exists when user
+     * supplied a new updated one.
      */
     if (email && email !== user.email) {
       /**
        * This checks if another user already uses this email.
        *
        * At this point we know that this user already exists as checked by
-       * session controller middleware.
+       * session controller middleware. We are checking here if new supplied
+       * email already is owned by another user.
        */
       const userExists = await User.findOne({ where: { email } });
 
       if (userExists) {
         return res.status(400).json({ error: 'User email already exists' });
       }
-    } else {
-      email = user.email;
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
@@ -91,7 +90,7 @@ class UserController {
     return res.json({
       id,
       name,
-      email,
+      email: user.email,
     });
   }
 }
