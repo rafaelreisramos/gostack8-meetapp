@@ -1,6 +1,5 @@
 import { parseISO, isBefore } from 'date-fns';
 import * as Yup from 'yup';
-import { Op } from 'sequelize';
 
 import Meetup from '../models/Meetup';
 
@@ -23,6 +22,7 @@ class MeetupController {
       description: Yup.string().required(),
       location: Yup.string().required(),
       date: Yup.date().required(),
+      file_id: Yup.number().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -37,7 +37,7 @@ class MeetupController {
 
     const meetup = await Meetup.create({
       user_id: req.userId,
-      ...req.body
+      ...req.body,
     });
 
     return res.json(meetup);
@@ -49,6 +49,7 @@ class MeetupController {
       description: Yup.string(),
       location: Yup.string(),
       date: Yup.date(),
+      file_id: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
