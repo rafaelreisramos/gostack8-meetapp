@@ -10,7 +10,15 @@ class EnrollmentController {
   async store(req, res) {
     const { meetup_id } = req.params;
 
-    const meetup = await Meetup.findByPk(meetup_id);
+    const meetup = await Meetup.findByPk(meetup_id, {
+      include: [
+        {
+          model: User,
+          attributes: ['name', 'email'],
+        },
+      ],
+    });
+
     const user = await User.findByPk(req.userId);
 
     if (req.userId === meetup.user_id) {
@@ -64,9 +72,14 @@ class EnrollmentController {
     });
 
     await Mail.sendMail({
-      to: `${user.name} <${user.email}>`,
+      to: `${meetup.User.name} <${meetup.User.email}>`,
       subject: 'New enrollment',
-      text: 'You have a new meetup enrollment.',
+      template: 'enrollment',
+      context: {
+        organizer: meetup.User.name,
+        attendee: `${user.name} <${user.email}>`,
+        meetup: meetup.title,
+      },
     });
 
     return res.json(enrollment);
