@@ -4,9 +4,7 @@ import Meetup from '../models/Meetup';
 import User from '../models/User';
 import Enrollment from '../models/Enrollment';
 
-// Sempre que um usuário se inscrever no meetup, envie um e-mail ao organizador
-// contendo os dados relacionados ao usuário inscrito. O template do e-mail fica por sua
-// conta :)
+import Mail from '../../lib/Mail';
 
 class EnrollmentController {
   async store(req, res) {
@@ -63,6 +61,12 @@ class EnrollmentController {
     const enrollment = await Enrollment.create({
       user_id: user.id,
       meetup_id: meetup.id,
+    });
+
+    await Mail.sendMail({
+      to: `${user.name} <${user.email}>`,
+      subject: 'New enrollment',
+      text: 'You have a new meetup enrollment.',
     });
 
     return res.json(enrollment);
