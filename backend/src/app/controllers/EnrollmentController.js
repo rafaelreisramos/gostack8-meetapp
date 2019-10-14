@@ -4,7 +4,8 @@ import Meetup from '../models/Meetup';
 import User from '../models/User';
 import Enrollment from '../models/Enrollment';
 
-import Mail from '../../lib/Mail';
+import EnrollmentMail from '../jobs/EnrollmentMail';
+import Queue from '../../lib/Queue';
 
 class EnrollmentController {
   async store(req, res) {
@@ -71,15 +72,9 @@ class EnrollmentController {
       meetup_id: meetup.id,
     });
 
-    await Mail.sendMail({
-      to: `${meetup.User.name} <${meetup.User.email}>`,
-      subject: 'New enrollment',
-      template: 'enrollment',
-      context: {
-        organizer: meetup.User.name,
-        attendee: `${user.name} <${user.email}>`,
-        meetup: meetup.title,
-      },
+    await Queue.add(EnrollmentMail.key, {
+      meetup,
+      user,
     });
 
     return res.json(enrollment);

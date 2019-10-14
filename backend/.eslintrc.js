@@ -28,7 +28,10 @@ module.exports = {
           "store",
           "update",
           "index",
-          "delete"
+          "delete",
+          "handle",
+          "key",
+          "handleFailure",
         ]
       }
     ],
