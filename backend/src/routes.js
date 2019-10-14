@@ -9,6 +9,7 @@ import MeetupController from './app/controllers/MeetupController';
 import FileController from './app/controllers/FileController';
 import authMiddleware from './app/middlewares/auth';
 import EnrollmentController from './app/controllers/EnrollmentController';
+import ScheduleController from './app/controllers/ScheduleController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -16,6 +17,8 @@ const upload = multer(multerConfig);
 routes.post('/users', UserController.store);
 
 routes.post('/sessions', SessionController.store);
+
+routes.get('/meetups/schedule', ScheduleController.index);
 
 routes.use(authMiddleware);
 
